@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanCode", "CleanCode\CleanCode.csproj", "{B5BE8C34-C38B-477A-A095-904B4BBC3F6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Patterns", "Patterns\Patterns.csproj", "{E7A56C48-8E36-465B-9F8E-67BC8525CFE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BobinHomeWorkOne", "BobinHomeWorkOne\BobinHomeWorkOne.csproj", "{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,16 @@ Global
 		{E7A56C48-8E36-465B-9F8E-67BC8525CFE5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E7A56C48-8E36-465B-9F8E-67BC8525CFE5}.Release|x86.ActiveCfg = Release|Any CPU
 		{E7A56C48-8E36-465B-9F8E-67BC8525CFE5}.Release|x86.Build.0 = Release|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B0D34718-26CE-464E-9AE2-A8D3DC3B6075}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
