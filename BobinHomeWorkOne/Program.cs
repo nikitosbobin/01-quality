@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,86 +11,18 @@ namespace BobinHomeWorkOne
 {
     enum wordsSetType
     {
-        Simple, Bold, Italic
+        Simple, Bold, Italic, Code
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var inputFile = File.ReadAllLines(args[0]);
-            Console.WriteLine("helloworld");
-        }
-    }
-
-    class Text
-    {
-        Text(string[] inputText)
-        {
-            var tmpUnit = new List<string>();
-            foreach (var e in inputText)
-            {
-                tmpUnit.Add(e);
-                if (e == "\n")
-                {
-                    units.Add(new Unit(tmpUnit));
-                    tmpUnit.Clear();
-                }
-            }
-        }
-
-        private List<Unit> units;
-
-        private class Unit
-        {
-            public Unit(List<string> newUnit)
-            {
-                wordsSets = new List<WordsSet>();
-            }
-
-            private List<WordsSet> wordsSets; 
-
-            private class WordsSet
-            {
-                public WordsSet(string content, params wordsSetType[] types)
-                {
-                    this.content = content;
-                    this.types = types;
-                }
-
-                private wordsSetType[] types;
-                private 
-                private string content;
-
-                public string Content {
-                    get { return content; }
-                    set { content = value; }
-                }
-
-                public wordsSetType[] Types
-                {
-                    get { return types; }
-                    set { types = value; }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Print your text into html file.
-        /// </summary>
-        /// <param name="name">Name of out file, without ".html"</param>
-        /// <returns></returns>
-        public bool ToHtml(string name)
-        {
-            try
-            {
-                //to do
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            //var inputFile = File.ReadAllLines(args[0]);
+            //var text = new Text(inputFile);
+            var a = "ехал _Грека _тёмную_ через_ реку";
+            Console.WriteLine(new Line(a).Content);
+            Console.ReadKey();
         }
     }
 }
