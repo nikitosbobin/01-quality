@@ -6,11 +6,25 @@ namespace BobinHomeWorkOne
     [TestFixture]
     class Text_Test
     {
-        [TestCase("ехал _Грека через_ реку", Result = "ехал <em>Грека через</em> реку\n", TestName = "one em layout")]
-        [TestCase("ехал `Грека через` реку", Result = "ехал <code>Грека через</code> реку\n", TestName = "one code layout")]
-        public string testOne(string input)
+        [TestCase("__ghbhg", 0, Result = 2)]
+        [TestCase("___`_ghbhg", 0, Result = 3)]
+        [TestCase("ghbhg", 0, Result = 0)]
+        public int TestGetDownCount(string word, int start)
         {
-            return (new Line(input)).Content;
+            return Line.GetDownCount(word, start);
+        }
+
+        [TestCase("hhh", Result = null)]
+        [TestCase("___``_", Result = null)]
+        [TestCase("_hhh", Result = new wordsSetType[] { wordsSetType.ItalicOpen })]
+        [TestCase("__hhh", Result = new wordsSetType[] { wordsSetType.BoldOpen })]
+        [TestCase("`hhh", Result = new wordsSetType[] { wordsSetType.CodeOpen })]
+        [TestCase("`_hhh", Result = new wordsSetType[] { wordsSetType.CodeOpen, wordsSetType.ItalicOpen })]
+        [TestCase("`___hhh", Result = new wordsSetType[] { wordsSetType.CodeOpen, wordsSetType.Collision })]
+        [TestCase("\\`___hhh", Result = new wordsSetType[] { wordsSetType.IgnoreOpen, wordsSetType.CodeOpen, wordsSetType.Collision })]
+        public wordsSetType[] TestGetOpeners(string input)
+        {
+            return Line.GetOpeners(input);
         }
     }
 }

@@ -9,9 +9,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace BobinHomeWorkOne
 {
-    enum wordsSetType
+    public enum wordsSetType
     {
-        Simple, Bold, Italic, Code
+        SimpleOpen, SimpleClose, BoldOpen, BoldClose, ItalicOpen, ItalicSlose, 
+        CodeOpen, CodeClose, Collision, IgnoreOpen, IgnoreClose
     }
 
     class Program
@@ -20,8 +21,8 @@ namespace BobinHomeWorkOne
         {
             //var inputFile = File.ReadAllLines(args[0]);
             //var text = new Text(inputFile);
-            var a = "ехал _Грека _тёмную_ через_ реку";
-            Console.WriteLine(new Line(a).Content);
+
+            Console.WriteLine(Line.GetOpeners("`___hh").Length);
             Console.ReadKey();
         }
     }

@@ -8,55 +8,90 @@ namespace BobinHomeWorkOne
 {
     public class Line
     {
-        private static Dictionary<string, string> htmlTags;
-
-        private static void InitTags()
+        public static wordsSetType[] GetOpeners(string word)
         {
-            htmlTags = new Dictionary<string, string>();
-            htmlTags["_"] = "em>";
-            htmlTags["__"] = "strong>";
-            htmlTags["`"] = "code>";
+            var result = new List<wordsSetType>();
+            int end = -1;
+            for (int i = 0; i < word.Length; ++i)
+                if (word[i] != '`' && word[i] != '\\' && word[i] != '_') { end = i - 1; break; }
+            if (end == -1 || end + 1 == word.Length) return null;
+            for (int i = 0; i <= end; ++i)
+            {
+                switch (word[i])
+                {
+                    case '\\': result.Add(wordsSetType.IgnoreOpen);
+                        continue;
+                    case '`': result.Add(wordsSetType.CodeOpen); 
+                        continue;
+                    default: HandleDownMarks(result, word, ref i);
+                        continue;
+                }
+            }
+            return result.ToArray();
         }
 
-        private static string GetOpener(string word)
+        private static void HandleDownMarks(List<wordsSetType> result, string word, ref int i)
         {
-            if (word.IndexOf("_") == 0) return "_";
-            if (word.IndexOf("`") == 0) return "`";
-            if (word.IndexOf("__") == 0) return "__";
-            return "";
+            var down = GetDownCount(word, i);
+                switch (down)
+                {
+                    case 1: result.Add(wordsSetType.ItalicOpen); break;
+                    case 2: i++; result.Add(wordsSetType.BoldOpen); break;
+                    default: i += down - 1; result.Add(wordsSetType.Collision); break;
+                }
         }
 
-        public Line(string content)
+        public static int GetDownCount(string word, int start)
         {
-            InitTags();
-            var tempWords = content.Split(' ');
-            var stackTags = new Stack<string>();
-            var result = new StringBuilder();
-            string tmpTag;
+            int count = 0;
+            for (int i = start; i < word.Length; ++i)
+                if (word[i] == '_') count++;
+                else return count;
+            return 0;
+        }
+
+        public Line(string input)
+        {
+            var stack = new Stack<KeyValuePair<wordsSetType, int>>();
+            var tempWords = input.Split(' ');
             for (var i = 0; i < tempWords.Length; ++i)
             {
-                if ((tmpTag = GetOpener(tempWords[i])) != "")
-                {
-                    stackTags.Push(tmpTag);
-                    result.Append("<");
-                    result.Append(htmlTags[tmpTag]);
-                    result.Append(tempWords[i].Substring(tmpTag.Length));
-                }
-                else if (stackTags.Count() != 0 && (tmpTag = stackTags.Peek()) ==
-                         tempWords[i].Substring(tempWords[i].Length - stackTags.Peek().Length))
-                {
-                    stackTags.Pop();
-                    result.Append(tempWords[i].Substring(0, tempWords[i].Length - tmpTag.Length));
-                    result.Append("</");
-                    result.Append(htmlTags[tmpTag]);
-                }
-                else result.Append(tempWords[i]);
-                result.Append(i == (tempWords.Length - 1) ? "\n" : " ");
+
             }
-            this.content = result.ToString();
         }
+
+        //public Line(string content)
+        //{
+        //    InitTags();
+        //    var tempWords = content.Split(' ');
+        //    var stackTags = new Stack<string>();
+        //    var result = new StringBuilder();
+        //    string tmpTag;
+        //    for (var i = 0; i < tempWords.Length; ++i)
+        //    {
+        //        if ((tmpTag = GetOpener(tempWords[i])) != "")
+        //        {
+        //            stackTags.Push(tmpTag);
+        //            result.Append("<");
+        //            result.Append(htmlTags[tmpTag]);
+        //            result.Append(tempWords[i].Substring(tmpTag.Length));
+        //        }
+        //        else if (stackTags.Count() != 0 && (tmpTag = stackTags.Peek()) ==
+        //                 tempWords[i].Substring(tempWords[i].Length - stackTags.Peek().Length))
+        //        {
+        //            stackTags.Pop();
+        //            result.Append(tempWords[i].Substring(0, tempWords[i].Length - tmpTag.Length));
+        //            result.Append("</");
+        //            result.Append(htmlTags[tmpTag]);
+        //        }
+        //        else result.Append(tempWords[i]);
+        //        result.Append(i == (tempWords.Length - 1) ? "\n" : " ");
+        //    }
+        //    this.content = result.ToString();
+        //}
         private string content;
-        public string Content {
+        public string Content
+        {
             get { return content; }
             private set { }
         }
