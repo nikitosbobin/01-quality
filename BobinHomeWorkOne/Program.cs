@@ -9,20 +9,16 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace BobinHomeWorkOne
 {
-    public enum wordsSetType
+    public enum TagType
     {
-        SimpleOpen, SimpleClose, BoldOpen, BoldClose, ItalicOpen, ItalicSlose, 
-        CodeOpen, CodeClose, Collision, IgnoreOpen, IgnoreClose
+        Null, Bold, Italic, Code, Collision, IgnoreNext, IgnoreBold, IgnoreItalic, IgnoreCode
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            //var inputFile = File.ReadAllLines(args[0]);
-            //var text = new Text(inputFile);
-
-            Console.WriteLine(Line.GetOpeners("`___hh").Length);
+            Line f = new Line("`_i_`");
             Console.ReadKey();
         }
     }
