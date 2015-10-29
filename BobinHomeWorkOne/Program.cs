@@ -18,7 +18,8 @@ namespace BobinHomeWorkOne
     {
         static void Main(string[] args)
         {
-            Line f = new Line("`_i_`");
+            var t = new Layout("kj \\\\ `_gfghdf_` kgf");
+            Console.WriteLine(t.ToString());
             Console.ReadKey();
         }
     }
