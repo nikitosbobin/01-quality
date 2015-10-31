@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace BobinHomeWorkOne
@@ -15,7 +14,7 @@ namespace BobinHomeWorkOne
         [TestCase("hhh``hh", Result = "hhhyyhh")]
         public String ShouldDeleteIgnoredLayouts(String input)
         {
-            return Layout.ExcludeCode(input);
+            return Layout.SimplifyCodeLayout(input);
         }
 
         [TestCase("hhh", true,  Result = 0)]
@@ -31,13 +30,13 @@ namespace BobinHomeWorkOne
 
 
         [TestCase("_hhh_", Result = "_hhh_")]
-        [TestCase("_hh_ _h_", Result = "_hh_")]
+        [TestCase("_hhhh_ _h_", Result = "_hhhh_")]
         [TestCase("_hh__h_", Result = "_hh__h_")]
         [TestCase("___hgjkfdh_", Result = "")]
         [TestCase("___hgjk`_ghf_`fdh__", Result = "___hgjk`_ghf_`fdh__")]
         [TestCase("hgjk`_ghf_`fdh", Result = "")]
         [TestCase("_hgj\\_kfdh_", Result = "_hgj\\_kfdh_")]
-        [TestCase("_hgj\\_ kfdh_", Result = "_hgj_ kfdh_")]
+        [TestCase("_hgj\\_ kfdh_", Result = "_hgj\\_ kfdh_")]
         public String ShouldSplitStringByDownMarks(String input)
         {
             return Layout.SplitOptions(input);
