@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using NUnit.Framework;
 
 namespace BobinHomeWorkOne
 {
@@ -11,7 +12,7 @@ namespace BobinHomeWorkOne
         Null, Italic, Bold, Simple, Code
     }
 
-    public class Layout
+    internal class Layout
     {
         public Layout(String origin)
         {
@@ -92,14 +93,14 @@ namespace BobinHomeWorkOne
         public List<Layout> inside;
         public LayoutType type;
         public String origin;
-        private const char EMPTY_CHAR = 'h';
         private const char ITALIC = '_';
         private const char CODE = '`';
         private const char IGNORE = '\\';
 
+        //написать тесты
         public static Tuple<LayoutType, String, int> GetNextUnderbar(String input, int startIndex)
         {
-            int countStart = GetDownCount(input, startIndex);
+            int countStart = GetDownCount(input, true, startIndex);
             Tuple<int, int> result;
             if (countStart + startIndex < input.Length && input[countStart + startIndex] == ' ')
                 return new Tuple<LayoutType, String, int>(LayoutType.Null, String.Empty, 0);
@@ -116,22 +117,24 @@ namespace BobinHomeWorkOne
             return new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
         }
 
+        //написать тесты
         public static Tuple<int, int> FindLastMark(String input)
         {
             var t = ExcludeCode(input);
             var layoutText = SplitOptions(t);
             if (string.IsNullOrEmpty(layoutText)) return new Tuple<int, int>(0, -1);
-            return new Tuple<int, int>(GetDownCountLeft(layoutText), t.IndexOf(layoutText) + layoutText.Length - 1);
+            return new Tuple<int, int>(GetDownCount(layoutText, false), t.IndexOf(layoutText) + layoutText.Length - 1);
         }
 
+        //написать тесты
         public static String SplitOptions(String word)
         {
             String pattern;
-            int countFirstMarks = GetDownCount(word);
+            int countFirstMarks = GetDownCount(word, true);
             switch (countFirstMarks)
             {
                 case 1:
-                    pattern = @"_[^ ].*?[^ ](_ |_$)";
+                    pattern = @"_[^ ].*?[^ ]_( |$)";
                     break;
                 case 2:
                     pattern = @"__[^ ].*?[^ ]__( |$)";
@@ -146,7 +149,8 @@ namespace BobinHomeWorkOne
             return Regex.Match(word, pattern).ToString().TrimEnd();
         }
 
-        private static String ExcludeCode(String word)
+        //обложен тестами
+        public static String ExcludeCode(String word)
         {
             var e = Regex.Replace(word, @"\\`", o => new string('y', o.Length));
             while (e.Count(y => y == '`') > 1)
@@ -160,22 +164,23 @@ namespace BobinHomeWorkOne
             }
             return e;
         }
-        private static int GetDownCount(String input, int index = 0)
-        {
-            int count = 0;
-            for (int i = index; i < input.Length; ++i)
-                if (input[i] == '_') count++;
-                else break;
-            return count;
-        }
 
-        private static int GetDownCountLeft(String input)
+        //обложен тестами
+        public static int GetDownCount(String input, bool right, int index = 0)
         {
-            input = input.TrimEnd();
             int count = 0;
-            for (int i = input.Length - 1; i >= 0; --i)
-                if (input[i] == '_') count++;
-                else break;
+            if (right)
+            {
+                for (int i = index; i < input.Length; ++i)
+                    if (input[i] == '_') count++;
+                    else break;
+            }
+            else
+            {
+                for (int i = input.Length - 1; i >= 0; --i)
+                    if (input[i] == '_') count++;
+                    else break;
+            }
             return count;
         }
     }
@@ -213,7 +218,7 @@ namespace BobinHomeWorkOne
             return result.ToString();
         }
 
-        public class Unit
+        private class Unit
         {
             public Unit(List<String> newUnit)
             {

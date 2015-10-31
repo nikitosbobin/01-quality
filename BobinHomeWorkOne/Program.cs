@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace BobinHomeWorkOne
@@ -16,10 +17,11 @@ namespace BobinHomeWorkOne
         {
             var inputFile = File.ReadAllLines(args[0]);
             var readyHtml = new Text(inputFile);
-            Console.WriteLine(readyHtml.ToString());
-            Console.ReadKey();
+            var a = File.Create("out.html");
+            StreamWriter o = new StreamWriter(a);
+            o.WriteLine(readyHtml.ToString());
+            o.Close();
+            //Console.ReadKey();
         }
     }
 }
-
-//если перед открывающимся тегом разметки написан обычный текст то происходит какой-то треш
