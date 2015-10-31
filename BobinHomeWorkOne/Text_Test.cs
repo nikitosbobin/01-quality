@@ -7,19 +7,18 @@ namespace BobinHomeWorkOne
     [TestFixture]
     class Text_Test
     {
-        [TestCase("__jhd__", 0, Result = new int[]{ 2, 2, 5 })]
-        [TestCase("__jhd __", 0, Result = new int[] { 2, 0, -1 })]
-        [TestCase("__jhd __ gfdg__", 0, Result = new int[] { 2, 2, 13 })]
-        [TestCase("jhd__", 0, Result = new int[] { 0, 2, 3 })]
-        [TestCase("jhd __", 0, Result = new int[] { 0, 0, -1 })]
-        public int[] TestGetEndOfUnderscore(string word, int start)
-        {
-            var result = new int[3];
-            var tmp = Layout.GetEndOfUnderscore(word, start);
-            result[0] = tmp.Item1;
-            result[1] = tmp.Item2;
-            result[2] = tmp.Item3;
-            return result;
-        }
+        //[TestCase("hdhk _hjkfhg _ gjh__fd_ ghdfjkg", 5, Result = "_hjkfhg _ gjh__fd_")]
+        //[TestCase("hdhk ____hjkfhg _ gjh__fd_ ghdfjkg", 5, Result = "")]
+        //[TestCase("hdhk _gjfg `hf_ ` hgh", 5, Result = "")]
+        //[TestCase("hdhk _gjf`jkj`jkj__jfhg`fd_ `g_", 5, Result = "_gjf`jkj`jkj__jfhg`fd_ `g_")]
+        //[TestCase("hdhk _gjf`jkj`jkj__jfhg`fd_ g_", 5, Result = "")]
+        //[TestCase("hdhk _gjfg_", 5, Result = "_gjfg_")]
+        //[TestCase("hdhk __gjfg__", 5, Result = "__gjfg__")]
+        //public String TestGetNextUnderbar(String word, int start)
+        //{
+        //    var result = Layout.GetNextUnderbar(word, start).Item2;
+        //    if (string.IsNullOrEmpty(result)) return "";
+        //    return result.Remove(result.Length - 1);
+        //}
     }
 }

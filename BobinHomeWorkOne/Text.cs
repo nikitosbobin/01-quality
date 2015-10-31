@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Security.AccessControl;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace BobinHomeWorkOne
 {
     public enum LayoutType
     {
-        Null, Simple, Bold, Italic, Code, Collision, IgnoreNext, IgnoreBold, IgnoreItalic, IgnoreCode
+        Null, Italic, Bold, Simple, Code
     }
 
     public class Layout
     {
-        public Layout(string origin)
+        public Layout(String origin)
         {
             type = LayoutType.Simple;
             inside = InputStringToListOfLayouts(origin);
         }
 
-        public Layout(string origin, LayoutType type)
+        public Layout(String origin, LayoutType type)
         {
             this.type = type;
             if (type == LayoutType.Simple || type == LayoutType.Code)
@@ -30,10 +28,9 @@ namespace BobinHomeWorkOne
                 inside = InputStringToListOfLayouts(origin);
         }
 
-        private static List<Layout> InputStringToListOfLayouts(string input)
+        private static List<Layout> InputStringToListOfLayouts(String input)
         {
             var result = new List<Layout>();
-            char thisTagChar = EMPTY_CHAR;
             int start = 0;
             for (int i = 0; i < input.Length; ++i)
             {
@@ -44,52 +41,45 @@ namespace BobinHomeWorkOne
                 }
                 else if (input[i] == CODE)
                 {
-                    var stringAfterCode = input.Substring(i + 1);
+                    var StringAfterCode = input.Substring(i + 1);
                     int index;
-                    if ((index = stringAfterCode.IndexOf(CODE)) != -1)
+                    if ((index = StringAfterCode.IndexOf(CODE)) != -1)
                     {
-                        if (thisTagChar == EMPTY_CHAR)
-                            result.Add(new Layout(input.Substring(start, i - start), LayoutType.Simple));
-                        result.Add(new Layout(stringAfterCode.Substring(0, index), LayoutType.Code));
+                        result.Add(new Layout(input.Substring(start, i - start), LayoutType.Simple));
+                        result.Add(new Layout(StringAfterCode.Substring(0, index), LayoutType.Code));
                         start = i = i + index + 2;
                     }
                 }
                 else if (input[i] == ITALIC)
                 {
-                    var tmpResult = GetEndOfUnderscore(input, i);
-                    var item1 = tmpResult.Item1;
-                    var item2 = tmpResult.Item2;
-                    var item3 = tmpResult.Item3;
-                    if (item1 == item2 && item2 == 2)
+                    var thisTypeWord = GetNextUnderbar(input, i);
+                    if (thisTypeWord.Item1 != LayoutType.Null)
                     {
-                        result.Add(new Layout(input.Substring(i + 2, item3 - i - 2), LayoutType.Bold));
-                        i = item3;
-                    }
-                    else if (item1 != 0 && item2 != 0)
-                    {
-                        result.Add(new Layout(input.Substring(i + 1, item3 - i - 1), LayoutType.Bold));
-                        i = item3;
+                        result.Add(new Layout(input.Substring(start, i - start), LayoutType.Simple));
+                        result.Add(new Layout(thisTypeWord.Item2, thisTypeWord.Item1));
+                        i = i + thisTypeWord.Item2.Length + thisTypeWord.Item3;
+                        start = i + 1;
                     }
                 }
             }
-            if (start != input.Length)
+            if (start < input.Length)
                 result.Add(new Layout(input.Substring(start), LayoutType.Simple));
             return result;
         }
 
-        public override string ToString()
+        public override String ToString()
         {
             switch (type)
             {
                 case LayoutType.Simple: return inside == null ? origin : PrintInside();
-                case LayoutType.Code: return string.Format("<code>{0}</code>", inside == null ? origin : PrintInside());
-                case LayoutType.Bold: return string.Format("<strong>{0}</strong>", PrintInside());
-                case LayoutType.Italic: return string.Format("<em>{0}</em>", PrintInside());
+                case LayoutType.Code: return String.Format("<code>{0}</code>", inside == null ? origin : PrintInside());
+                case LayoutType.Bold: return String.Format("<strong>{0}</strong>", PrintInside());
+                case LayoutType.Italic: return String.Format("<em>{0}</em>", PrintInside());
             }
             return "";
         }
 
-        private string PrintInside()
+        private String PrintInside()
         {
             StringBuilder result = new StringBuilder();
             foreach (var e in inside)
@@ -101,39 +91,76 @@ namespace BobinHomeWorkOne
 
         public List<Layout> inside;
         public LayoutType type;
-        public string origin;
+        public String origin;
         private const char EMPTY_CHAR = 'h';
         private const char ITALIC = '_';
-        private const char BOLD = 'B';
         private const char CODE = '`';
         private const char IGNORE = '\\';
 
-        //item1 - это количество подчеркиваний в начале
-        //item2 - это количество подчеркиваний в конце
-        //item3 - это индекс последнего подчёркивания
-        //выходные данные полностью соответствуют требованиям программы
-        public static Tuple<int, int, int> GetEndOfUnderscore(string input, int index)
+        public static Tuple<LayoutType, String, int> GetNextUnderbar(String input, int startIndex)
         {
-            int countStart = GetDownCount(input, index);
-            if (input[countStart + index] == ' ' || countStart > 3)
-                return new Tuple<int, int, int>(countStart, 0, -1);
-            int countEnd = 0;
-            var temmp = input.Substring(countStart + index);
-            int endIndex = -1;
-            int i = countStart + index - 1;
-            while ((i = input.Substring(i + 1).IndexOf(" ")) != -1)
+            int countStart = GetDownCount(input, startIndex);
+            Tuple<int, int> result;
+            if (countStart + startIndex < input.Length && input[countStart + startIndex] == ' ')
+                return new Tuple<LayoutType, String, int>(LayoutType.Null, String.Empty, 0);
+            result = FindLastMark(input.Substring(startIndex));
+            int endIndex;
+            if (result.Item1 != 0)
             {
-                if (input[i - 1] == '_')
-                {
-                    countEnd = GetDownCountLeft(input, i - 1);
-
-                }
-                temmp = temmp.Substring(i + 1);
+                endIndex = result.Item2;
+                if (countStart == 2 && result.Item1 >= 2)
+                    return new Tuple<LayoutType, string, int>(LayoutType.Bold, input.Substring(startIndex + 2, endIndex - 3), result.Item1 + countStart);
+                if ((countStart == 1 || countStart == 3) && result.Item1 >= 1)
+                    return new Tuple<LayoutType, string, int>(LayoutType.Italic, input.Substring(startIndex + 1, endIndex - 1), result.Item1 + countStart);  
             }
-            return new Tuple<int, int, int>(countStart, countEnd, endIndex);
+            return new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
         }
 
-        private static int GetDownCount(string input, int index)
+        public static Tuple<int, int> FindLastMark(String input)
+        {
+            var t = ExcludeCode(input);
+            var layoutText = SplitOptions(t);
+            if (string.IsNullOrEmpty(layoutText)) return new Tuple<int, int>(0, -1);
+            return new Tuple<int, int>(GetDownCountLeft(layoutText), t.IndexOf(layoutText) + layoutText.Length - 1);
+        }
+
+        public static String SplitOptions(String word)
+        {
+            String pattern;
+            int countFirstMarks = GetDownCount(word);
+            switch (countFirstMarks)
+            {
+                case 1:
+                    pattern = @"_[^ ].*?[^ ](_ |_$)";
+                    break;
+                case 2:
+                    pattern = @"__[^ ].*?[^ ]__( |$)";
+                    break;
+                case 3:
+                    pattern = @"___[^ ].*?[^ ]__( |$)";
+                    break;
+                default:
+                    pattern = "";
+                    break;
+            }
+            return Regex.Match(word, pattern).ToString().TrimEnd();
+        }
+
+        private static String ExcludeCode(String word)
+        {
+            var e = Regex.Replace(word, @"\\`", o => new string('y', o.Length));
+            while (e.Count(y => y == '`') > 1)
+            {
+                var b = Regex.Match(e, @"`.*?`").ToString();
+                var t = e.IndexOf(b);
+                String a1 = e.Substring(0, t);
+                String a2 = new string('y', b.Length);
+                String a3 = e.Substring(t + b.Length);
+                e = (a1 + a2 + a3);
+            }
+            return e;
+        }
+        private static int GetDownCount(String input, int index = 0)
         {
             int count = 0;
             for (int i = index; i < input.Length; ++i)
@@ -142,192 +169,53 @@ namespace BobinHomeWorkOne
             return count;
         }
 
-        private static int GetDownCountLeft(string input, int index)
+        private static int GetDownCountLeft(String input)
         {
+            input = input.TrimEnd();
             int count = 0;
-            for (int i = input.Length - 1; i >= index; --i)
+            for (int i = input.Length - 1; i >= 0; --i)
                 if (input[i] == '_') count++;
                 else break;
             return count;
         }
-
-        private static bool IsTag(string line, int index)
-        {
-            try
-            {
-                if (line[index] == '`' || line[index] == '_' || line[index] == '\\') return true;
-            }
-            catch
-            {
-                return false;
-            }
-            return false;
-        }
     }
-
-    //public class Line
-    //{
-    //    public static int GetDownCount(string word, int start)
-    //    {
-    //        int count = 0;
-    //        for (int i = start; i < word.Length; ++i)
-    //            if (word[i] == '_') count++;
-    //            else break;
-    //        return count;
-    //    }
-
-    //    public Line(string line)
-    //    {
-    //        content = line;
-    //        listOfTypes = new List<KeyValuePair<TagType, int>>();
-    //        var stack = new Stack<KeyValuePair<TagType, int>>();
-    //        for (int i = 0; i < line.Length; ++i)
-    //        {
-    //            var tmp = GetTagType(line, ref i);
-    //            if (tmp.Key != TagType.Null)
-    //            {
-    //                if (stack.Count() != 0)
-    //                {
-    //                    if (stack.Peek().Key == tmp.Key)
-    //                    {
-    //                        listOfTypes.Add(stack.Pop());
-    //                        listOfTypes.Add(tmp);
-    //                    }
-    //                    else
-    //                    {
-    //                        if (tmp.Key == TagType.IgnoreNext)
-    //                        {
-    //                            int next = i + 1;
-    //                            var t = GetTagType(line, ref next);
-    //                            listOfTypes.Add(new KeyValuePair<TagType, int>(TransformIgnore(t.Key), t.Value));
-    //                            i = next;
-    //                        }
-    //                        else if ((tmp.Key == TagType.Italic || tmp.Key == TagType.Bold) && stack.Peek().Key == TagType.Collision)
-    //                        {
-    //                            var temp = stack.Pop();
-    //                            listOfTypes.Add(new KeyValuePair<TagType, int>(TagType.Italic, temp.Value));
-    //                            if (tmp.Key == TagType.Italic)
-    //                            {
-    //                                listOfTypes.Add(tmp);
-    //                            }
-    //                            else
-    //                            {
-    //                                listOfTypes.Add(new KeyValuePair<TagType, int>(TagType.Italic, tmp.Value + 1));
-    //                            }
-    //                        }
-    //                        else stack.Push(tmp);
-    //                    }
-    //                }
-    //                else
-    //                {
-    //                    if (tmp.Key == TagType.IgnoreNext)
-    //                    {
-    //                        int next = i + 1;
-    //                        var t = GetTagType(line, ref next);
-    //                        listOfTypes.Add(new KeyValuePair<TagType, int>(TransformIgnore(t.Key), t.Value - 1));
-    //                        i = next;
-    //                    }
-    //                    else stack.Push(tmp);
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    private static TagType TransformIgnore(TagType ignored)
-    //    {
-    //        switch (ignored)
-    //        {
-    //            case TagType.Bold:
-    //                return TagType.IgnoreBold;
-    //            case TagType.Code:
-    //                return TagType.IgnoreCode;
-    //            case TagType.Italic:
-    //                return TagType.IgnoreItalic;
-    //            case TagType.Collision:
-    //                return TagType.IgnoreItalic;
-    //            default:
-    //                return TagType.Null;
-    //        }
-    //    }
-
-    //    public static bool IsTag(string line, int index)
-    //    {
-    //        try
-    //        {
-    //            if (line[index] == '`' || line[index] == '_' || line[index] == '\\') return true;
-    //        }
-    //        catch
-    //        {
-    //            return false;
-    //        }
-    //        return false;
-    //    }
-
-    //    public static KeyValuePair<TagType, int> GetTagType(string line, ref int index)
-    //    {
-    //        if ((line.Length <= index + 1) ||
-    //            !IsTag(line, index)) return new KeyValuePair<TagType, int>(TagType.Null, -1);
-    //        switch (line[index])
-    //        {
-    //            case '`':
-    //                return new KeyValuePair<TagType, int>(TagType.Code, index);
-    //            case '\\':
-    //                return new KeyValuePair<TagType, int>(IsTag(line, index + 1) ? TagType.IgnoreNext : TagType.Null,
-    //                    index);
-    //        }
-    //        var countMd = GetDownCount(line, index);
-    //        var oldI = index;
-    //        index += countMd;
-    //        switch (countMd)
-    //        {
-    //            case 1:
-    //                return new KeyValuePair<TagType, int>(TagType.Italic, oldI);
-    //            case 2:
-    //                return new KeyValuePair<TagType, int>(TagType.Bold, oldI);
-    //            case 3:
-    //                return new KeyValuePair<TagType, int>(TagType.Collision, oldI);
-    //            default:
-    //                return new KeyValuePair<TagType, int>(TagType.Null, -1);
-    //        }
-    //    }
-
-    //    private List<KeyValuePair<TagType, int>> listOfTypes;
-    //    private string content;
-    //}
 
     public class Text
     {
-        public Text(string[] inputText)
+        public Text(String[] inputText)
         {
-            var tmpUnit = new List<string>();
+            var tmpUnit = new List<String>();
+            units = new List<Unit>();
             foreach (var e in inputText)
             {
-                tmpUnit.Add(e);
-                if (e == "\n")
+                if (e == "")
                 {
                     units.Add(new Unit(tmpUnit));
                     tmpUnit.Clear();
                 }
+                else
+                    tmpUnit.Add(e);
             }
+            units.Add(new Unit(tmpUnit));
         }
 
         private List<Unit> units;
 
-        public override string ToString()
+        public override String ToString()
         {
             StringBuilder result = new StringBuilder();
-            result.AppendLine("<p>");
+            result.AppendLine("<html>");
+            result.AppendLine("<body>");
             foreach (var e in units)
-            {
                 result.AppendLine(e.ToString());
-            }
-            result.AppendLine("</p>");
+            result.AppendLine("</body>");
+            result.AppendLine("</html>");
             return result.ToString();
         }
 
         public class Unit
         {
-            public Unit(List<string> newUnit)
+            public Unit(List<String> newUnit)
             {
                 lines = new List<Layout>();
                 foreach (var t in newUnit)
@@ -336,15 +224,13 @@ namespace BobinHomeWorkOne
 
             private List<Layout> lines;
 
-            public override string ToString()
+            public override String ToString()
             {
                 StringBuilder result = new StringBuilder();
                 result.AppendLine("<p>");
                 foreach (var e in lines)
-                {
                     result.AppendLine(e.ToString());
-                }
-                result.AppendLine("</p>");
+                result.Append("</p>");
                 return result.ToString();
             }
         }

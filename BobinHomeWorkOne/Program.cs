@@ -6,21 +6,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.RegularExpressions;
 
 namespace BobinHomeWorkOne
 {
-    public enum TagType
-    {
-        Null, Bold, Italic, Code, Collision, IgnoreNext, IgnoreBold, IgnoreItalic, IgnoreCode
-    }
-
     class Program
     {
         static void Main(string[] args)
         {
-            var t = new Layout("kj \\\\ `_gfghdf_` kgf");
-            Console.WriteLine(t.ToString());
+            var inputFile = File.ReadAllLines(args[0]);
+            var readyHtml = new Text(inputFile);
+            Console.WriteLine(readyHtml.ToString());
             Console.ReadKey();
         }
     }
 }
+
+//если перед открывающимся тегом разметки написан обычный текст то происходит какой-то треш
