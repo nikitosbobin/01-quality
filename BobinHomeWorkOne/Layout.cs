@@ -52,7 +52,7 @@ namespace BobinHomeWorkOne
                     {
                         result.Add(new Layout(input.Substring(start, i - start), LayoutType.Simple));
                         result.Add(new Layout(thisTypeWord.Item2, thisTypeWord.Item1));
-                        i = i + thisTypeWord.Item2.Length + thisTypeWord.Item3;
+                        i = i + thisTypeWord.Item2.Length + thisTypeWord.Item3 - 1;
                         start = i + 1;
                     }
                 }
@@ -60,6 +60,21 @@ namespace BobinHomeWorkOne
             if (start < input.Length)
                 result.Add(new Layout(input.Substring(start), LayoutType.Simple));
             return result;
+        }
+
+        private static String SplitWithMoreAccuracy(String input)
+        {
+            String pattern = @".+[^ \\]_( |$)";
+            int endOfPattern = GetResidueOpenerIndex(input);
+            if (endOfPattern == -1) return Regex.Match(input, pattern).ToString();
+            return Regex.Match(input.Substring(0, endOfPattern), pattern).ToString();
+        }
+
+        private static int GetResidueOpenerIndex(String residue)
+        {
+            String findedSubstring = Regex.Match(residue, @" _[^_]| ___").ToString();
+            if (String.IsNullOrEmpty(findedSubstring)) return -1;
+            return residue.IndexOf(findedSubstring, StringComparison.Ordinal);
         }
 
         public override String ToString()
@@ -124,16 +139,15 @@ namespace BobinHomeWorkOne
         {
             String pattern;
             int countFirstMarks = GetDownCount(word, true);
+            if (countFirstMarks == 1)
+                return SplitWithMoreAccuracy(word).TrimEnd();
             switch (countFirstMarks)
             {
-                case 1:
-                    pattern = @"_[^ ].*?[^ ][^\\]_( |$)";
-                    break;
                 case 2:
-                    pattern = @"__[^ ].*?[^ ][^\\]__( |$)";
+                    pattern = @"__[^ ].*?[^ \\]__( |$)";
                     break;
                 case 3:
-                    pattern = @"___[^ ].*?[^ ][^\\]__( |$)";
+                    pattern = @"___[^ ].*?[^ \\]__( |$)";
                     break;
                 default:
                     pattern = "";
@@ -174,7 +188,7 @@ namespace BobinHomeWorkOne
             {
                 for (int i = input.Length - 1; i >= 0; --i)
                     if (input[i] == '_') count++;
-                    else break;
+                    else if (input[i] != ' ') break;
             }
             return count;
         }

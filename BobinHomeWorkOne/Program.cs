@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace BobinHomeWorkOne
 {
@@ -12,6 +13,8 @@ namespace BobinHomeWorkOne
             StreamWriter o = new StreamWriter(a);
             o.WriteLine(readyHtml.ToString());
             o.Close();
+            //string input = @"Внутри _выделения \<em\> может быть __\<strong\>__ выделение_";
+            //var g = new StringHandler(input);
             //Console.ReadKey();
         }
     }
