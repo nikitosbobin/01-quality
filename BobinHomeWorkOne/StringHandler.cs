@@ -3,20 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BobinHomeWorkOne
 {
     class StringHandler
     {
-        private String data;
-        public String Data
-        {
-            get { return data; }
-            private set { }
-        }
-        private int iterator;
-        public List<KeyValuePair<LayoutType, String>> oneLevel;
         public StringHandler(String inputData)
         {
             oneLevel = new List<KeyValuePair<LayoutType, string>>();
@@ -24,6 +15,23 @@ namespace BobinHomeWorkOne
             data = inputData;
             while (!IsIteratorEnd())
                 MoveIterator();
+        }
+
+        private String data;
+        public String Data
+        {
+            get { return data; }
+            private set { }
+        }
+        private int iterator;
+        private List<KeyValuePair<LayoutType, String>> oneLevel;
+
+        public List<Layout> Convert()
+        {
+            List<Layout> result = new List<Layout>();
+            foreach (var item in oneLevel)
+                result.Add(new Layout(item.Value, item.Key));
+            return result;  
         }
 
         public bool IsIteratorEnd()

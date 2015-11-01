@@ -28,7 +28,8 @@ namespace BobinHomeWorkOne
         public override String ToString()
         {
             StringBuilder result = new StringBuilder();
-            result.AppendLine("<html>");
+            result.AppendLine("<html xml:lang=\"ru\" lang=\"ru\">");
+            result.AppendLine("<meta content=\"text/html; charset=UTF-8\">");
             result.AppendLine("<body>");
             foreach (var e in units)
                 result.AppendLine(e.ToString());
