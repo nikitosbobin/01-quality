@@ -6,23 +6,18 @@ using System.Text.RegularExpressions;
 
 namespace BobinHomeWorkOne
 {
-    class StringHandler
+    internal class StringHandler
     {
         public StringHandler(String inputData)
         {
             oneLevel = new List<KeyValuePair<LayoutType, string>>();
             iterator = 0;
-            data = inputData;
+            Data = inputData;
             while (!IsIteratorEnd())
                 MoveIterator();
         }
 
-        private String data;
-        public String Data
-        {
-            get { return data; }
-            private set { data = value; }
-        }
+        public String Data { get; private set; }
         private int iterator;
         private List<KeyValuePair<LayoutType, String>> oneLevel;
 
@@ -31,76 +26,74 @@ namespace BobinHomeWorkOne
             List<Layout> result = new List<Layout>();
             foreach (var item in oneLevel)
                 result.Add(new Layout(item.Value, item.Key));
-            return result;  
+            return result;
         }
 
         public bool IsIteratorEnd()
         {
-            return iterator > data.Length - 1;
+            return iterator > Data.Length - 1;
         }
 
-        private bool MoveIterator()
+        private void MoveIterator()
         {
-            for (int i = iterator; i < data.Length; ++i)
+            for (int i = iterator; i < Data.Length; ++i)
             {
-                if (data[i] == '\\')
+                switch (Data[i])
                 {
-                    if (i < data.Length - 1 && (data[i + 1] == '`' || data[i + 1] == '_'))
-                    {
-                        data = data.Remove(i, 1);
+                    case '\\': 
+                        if (i < Data.Length - 1 && (Data[i + 1] == '`' || Data[i + 1] == '_'))
+                        {
+                            Data = Data.Remove(i, 1);
+                            i++;
+                        }
+                        break;
+                    case '`':
+                        var StringAfterCode = Data.Substring(i + 1);
+                        int index;
+                        if ((index = StringAfterCode.IndexOf('`')) != -1)
+                        {
+                            if (i > iterator)
+                                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, Data.Substring(iterator, i - iterator)));
+                            oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Code, StringAfterCode.Substring(0, index)));
+                            iterator = i + index + 2;
+                            return;
+                        }
+                        break;
+                    case '_':
+                        var thisTypeWord = GetNextUnderbar(i);
+                        if (thisTypeWord.Item1 != LayoutType.Null)
+                        {
+                            if (i > iterator)
+                                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, Data.Substring(iterator, i - iterator)));
+                            oneLevel.Add(new KeyValuePair<LayoutType, string>(thisTypeWord.Item1, thisTypeWord.Item2));
+                            iterator = i + thisTypeWord.Item2.Length + thisTypeWord.Item3;
+                            return;
+                        }
                         i++;
-                    }
-                }
-                if (data[i] == '`')
-                {
-                    var StringAfterCode = data.Substring(i + 1);
-                    int index;
-                    if ((index = StringAfterCode.IndexOf('`')) != -1)
-                    {
-                        if (i > iterator)
-                            oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, data.Substring(iterator, i - iterator)));
-                        oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Code, StringAfterCode.Substring(0, index)));
-                        iterator = i + index + 2;
-                        return true;
-                    }
-                }
-                if (data[i] == '_')
-                {
-                    var thisTypeWord = GetNextUnderbar(i);
-                    if (thisTypeWord.Item1 != LayoutType.Null)
-                    {
-                        if (i > iterator)
-                            oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, data.Substring(iterator, i - iterator)));
-                        oneLevel.Add(new KeyValuePair<LayoutType, string>(thisTypeWord.Item1, thisTypeWord.Item2));
-                        iterator = i + thisTypeWord.Item2.Length + thisTypeWord.Item3;
-                        return true;
-                    }
-                    i++;
+                        break;
                 }
             }
-            if (data.Length - 1 >= iterator)
+            if (Data.Length - 1 >= iterator)
             {
-                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, data.Substring(iterator)));
-                iterator = data.Length;
-                return true;
+                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, Data.Substring(iterator)));
+                iterator = Data.Length;
             }
-            return false;
         }
 
         public Tuple<LayoutType, String, int> GetNextUnderbar(int startIndex)
         {
-            int countStart = GetDownCount(data, true, startIndex);
+            int countStart = GetDownCount(Data, true, startIndex);
             Tuple<int, int> result;
-            if (countStart + startIndex < data.Length && data[countStart + startIndex] == ' ')
+            if (countStart + startIndex < Data.Length && Data[countStart + startIndex] == ' ')
                 return new Tuple<LayoutType, String, int>(LayoutType.Null, String.Empty, 0);
-            result = FindLastMark(data.Substring(startIndex));
+            result = FindLastMark(Data.Substring(startIndex));
             if (result.Item1 != 0)
             {
                 var endIndex = result.Item2;
                 if (countStart == 2 && result.Item1 >= 2)
-                    return new Tuple<LayoutType, string, int>(LayoutType.Bold, data.Substring(startIndex + 2, endIndex - 3), result.Item1 + countStart);
+                    return new Tuple<LayoutType, string, int>(LayoutType.Bold, Data.Substring(startIndex + 2, endIndex - 3), result.Item1 + countStart);
                 return (countStart == 1 || countStart == 3) && result.Item1 >= 1
-                    ? new Tuple<LayoutType, string, int>(LayoutType.Italic, data.Substring(startIndex + 1, endIndex - 1),
+                    ? new Tuple<LayoutType, string, int>(LayoutType.Italic, Data.Substring(startIndex + 1, endIndex - 1),
                         result.Item1 + countStart)
                     : new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
             }
@@ -123,10 +116,10 @@ namespace BobinHomeWorkOne
             {
                 case 1: return SplitWithMoreAccuracy(word).TrimEnd();
                 case 2:
-                    pattern = @"__.*?[^ \\]__( |$)";
+                    pattern = @"__.*?[^ \\]__( |$|\.|,|;)";
                     break;
                 case 3:
-                    pattern = @"___.*?[^ \\]__( |$)";
+                    pattern = @"___.*?[^ \\]__( |$|\.|,|;)";
                     break;
                 default:
                     pattern = "";
