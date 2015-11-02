@@ -47,10 +47,9 @@ namespace BobinHomeWorkOne
                 {
                     if (i < data.Length - 1 && (data[i + 1] == '`' || data[i + 1] == '_'))
                     {
-                        iterator = i + 2;
-                        return true;
+                        data = data.Remove(i, 1);
+                        i++;
                     }
-                    i++;
                 }
                 if (data[i] == '`')
                 {
@@ -100,15 +99,17 @@ namespace BobinHomeWorkOne
                 var endIndex = result.Item2;
                 if (countStart == 2 && result.Item1 >= 2)
                     return new Tuple<LayoutType, string, int>(LayoutType.Bold, data.Substring(startIndex + 2, endIndex - 3), result.Item1 + countStart);
-                if ((countStart == 1 || countStart == 3) && result.Item1 >= 1)
-                    return new Tuple<LayoutType, string, int>(LayoutType.Italic, data.Substring(startIndex + 1, endIndex - 1), result.Item1 + countStart);
+                return (countStart == 1 || countStart == 3) && result.Item1 >= 1
+                    ? new Tuple<LayoutType, string, int>(LayoutType.Italic, data.Substring(startIndex + 1, endIndex - 1),
+                        result.Item1 + countStart)
+                    : new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
             }
             return new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
         }
 
         private Tuple<int, int> FindLastMark(String input)
         {
-            var t = SimplifyCodeLayout(input);
+            var t = SimplifyCodeLayout(input).TrimEnd(';', '.', ' ', ',');
             var layoutText = SplitOptions(t);
             if (string.IsNullOrEmpty(layoutText)) return new Tuple<int, int>(0, -1);
             return new Tuple<int, int>(GetDownCount(layoutText, false), t.IndexOf(layoutText) + layoutText.Length - 1);
@@ -118,10 +119,9 @@ namespace BobinHomeWorkOne
         {
             String pattern;
             int countFirstMarks = GetDownCount(word, true);
-            if (countFirstMarks == 1)
-                return SplitWithMoreAccuracy(word).TrimEnd();
             switch (countFirstMarks)
             {
+                case 1: return SplitWithMoreAccuracy(word).TrimEnd();
                 case 2:
                     pattern = @"__.*?[^ \\]__( |$)";
                     break;
@@ -137,7 +137,7 @@ namespace BobinHomeWorkOne
 
         private static String SplitWithMoreAccuracy(String input)
         {
-            String pattern = @".+[^ \\]_( |$)";
+            String pattern = @".+[^ \\]_( |$|\.|,|;)";
             int endOfPattern = GetResidueOpenerIndex(input);
             if (endOfPattern == -1) return Regex.Match(input, pattern).ToString();
             return Regex.Match(input.Substring(0, endOfPattern), pattern).ToString();
