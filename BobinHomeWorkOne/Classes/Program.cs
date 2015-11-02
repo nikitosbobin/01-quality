@@ -10,12 +10,7 @@ namespace BobinHomeWorkOne
         {
             var inputFile = File.ReadAllLines(args[0], Encoding.Default);
             var readyHtml = new Text(inputFile);
-            var a = File.Create("out.html");
-            StreamWriter o = new StreamWriter(a);
-            o.WriteLine(readyHtml.ToString());
-            o.Close();
-            //string a = "_рпаврпыоавлр_.";
-            //var tttt = new Layout(a);
+            File.WriteAllLines("out.html", readyHtml.GetResultText(), Encoding.UTF8);
         }
     }
 }

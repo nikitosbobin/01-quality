@@ -25,17 +25,17 @@ namespace BobinHomeWorkOne
 
         private List<Unit> units;
 
-        public override String ToString()
+        public String[] GetResultText()
         {
-            StringBuilder result = new StringBuilder();
-            result.AppendLine("<html xml:lang=\"ru\" lang=\"ru\">");
-            result.AppendLine("<meta content=\"text/html; charset=UTF-8\">");
-            result.AppendLine("<body>");
+            var result = new List<String>();
+            result.Add("<html xml:lang=\"ru\" lang=\"ru\">");
+            result.Add("<meta content=\"text/html; charset=UTF-8\">");
+            result.Add("<body>");
             foreach (var e in units)
-                result.AppendLine(e.ToString());
-            result.AppendLine("</body>");
-            result.AppendLine("</html>");
-            return result.ToString();
+                result.Add(e.ToString());
+            result.Add("</body>");
+            result.Add("</html>");
+            return result.ToArray();
         }
     }
 }

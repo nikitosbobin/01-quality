@@ -21,7 +21,7 @@ namespace BobinHomeWorkOne
         public String Data
         {
             get { return data; }
-            private set { }
+            private set { data = value; }
         }
         private int iterator;
         private List<KeyValuePair<LayoutType, String>> oneLevel;
@@ -112,7 +112,7 @@ namespace BobinHomeWorkOne
             var t = SimplifyCodeLayout(input).TrimEnd(';', '.', ' ', ',');
             var layoutText = SplitOptions(t);
             if (string.IsNullOrEmpty(layoutText)) return new Tuple<int, int>(0, -1);
-            return new Tuple<int, int>(GetDownCount(layoutText, false), t.IndexOf(layoutText) + layoutText.Length - 1);
+            return new Tuple<int, int>(GetDownCount(layoutText, false), t.IndexOf(layoutText, StringComparison.Ordinal) + layoutText.Length - 1);
         }
 
         public static String SplitOptions(String word)
@@ -157,7 +157,7 @@ namespace BobinHomeWorkOne
             while (inputWithoutIgnore.Count(y => y == '`') > 1)
             {
                 var oneBlockInCodeTag = Regex.Match(inputWithoutIgnore, @"`.*?`").ToString();
-                var indexOfStartCodeTag = inputWithoutIgnore.IndexOf(oneBlockInCodeTag);
+                var indexOfStartCodeTag = inputWithoutIgnore.IndexOf(oneBlockInCodeTag, StringComparison.Ordinal);
                 tempBuilder.Append(inputWithoutIgnore.Substring(0, indexOfStartCodeTag));
                 tempBuilder.Append(new string('y', oneBlockInCodeTag.Length));
                 tempBuilder.Append(inputWithoutIgnore.Substring(indexOfStartCodeTag + oneBlockInCodeTag.Length));

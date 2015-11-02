@@ -8,14 +8,14 @@ namespace BobinHomeWorkOne
     {
         public Layout(String origin)
         {
-            StringHandler stringHandler = new StringHandler(origin);
+            var stringHandler = new StringHandler(origin);
             type = LayoutType.Simple;
             inside = stringHandler.Convert();
         }
 
         public Layout(String origin, LayoutType type)
         {
-            StringHandler stringHandler = new StringHandler(origin);
+            var stringHandler = new StringHandler(origin);
             this.type = type;
             if (type == LayoutType.Simple || type == LayoutType.Code)
                 this.origin = origin;

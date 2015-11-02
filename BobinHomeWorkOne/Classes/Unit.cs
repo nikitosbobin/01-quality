@@ -20,7 +20,8 @@ namespace BobinHomeWorkOne
             StringBuilder result = new StringBuilder();
             result.AppendLine("<p>");
             foreach (var e in lines)
-                result.AppendLine(e.ToString());
+                result.Append(e.ToString());
+            result.AppendLine();
             result.Append("</p>");
             return result.ToString();
         }
