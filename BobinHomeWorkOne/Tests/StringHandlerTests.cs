@@ -73,32 +73,38 @@ namespace BobinHomeWorkOne.Classes
                 return SplitWithMoreAccuracy(input);
             }
 
-            [TestCase("hhh``hh", 0, Result = new object[] { LayoutType.Null, "", 0 })]
-            [TestCase("_word_", 0, Result = new object[] { LayoutType.Italic, "word", 6 })]
-            [TestCase("__word__", 0, Result = new object[] { LayoutType.Bold, "word", 8 })]
-            [TestCase("___word\\_ next___", 0, Result = new object[] { LayoutType.Italic, "__word\\_ next__", 17 })]
-            [TestCase("_hgj_ kfdh_", 0, Result = new object[] { LayoutType.Italic, "hgj", 5 })]
-            [TestCase("_hgj_kfdh", 0, Result = new object[] { LayoutType.Null, "", 0 })]
-            [TestCase("_hgj`hghgh_ fhgjkfd`ghfdj_", 0, Result = new object[] { LayoutType.Italic, "hgj`hghgh_ fhgjkfd`ghfdj", 26 })]
-            public static object[] ShouldRightDetermineTypeOfWord(String testedWord, int index)
+            [TestCase("hhh``hh", 0, LayoutType.Null, "", 0 )]
+            [TestCase("_word_", 0, LayoutType.Italic, "word", 6 )]
+            [TestCase("__word__", 0, LayoutType.Bold, "word", 8 )]
+            [TestCase("___word\\_ next___", 0, LayoutType.Italic, "__word\\_ next__", 17 )]
+            [TestCase("_hgj_ kfdh_", 0, LayoutType.Italic, "hgj", 5 )]
+            [TestCase("_hgj_kfdh", 0, LayoutType.Null, "", 0 )]
+            [TestCase("_hgj`hghgh_ fhgjkfd`ghfdj_", 0, LayoutType.Italic, "hgj`hghgh_ fhgjkfd`ghfdj", 26 )]
+            public static void ShouldRightDetermineTypeOfWord(String testedWord, int index, 
+                LayoutType expectedType, String expectedWord, int expectedLastIndex)
             {
                 var temp = new StringHandler(testedWord);
                 var result = temp.GetNextUnderbar(index);
-                return new object[] { result.Type, result.CleanedWord, result.LastIndex };
+                Assert.AreEqual(expectedType ,result.Type);
+                Assert.AreEqual(expectedWord ,result.CleanedWord);
+                Assert.AreEqual(expectedLastIndex, result.LastIndex);
             }
 
-            [TestCase("_hgj_ kfdh_", 1, Result = new object[] { LayoutType.Italic ,"hgj", 5 })]
-            [TestCase("__hghhhj__", 1, Result = new object[] { LayoutType.Bold, "hghhhj", 10 })]
-            [TestCase("___hhj__", 1, Result = new object[] { LayoutType.Italic, "__hhj_", 8 })]
-            [TestCase("_hhj__", 1, Result = new object[] { LayoutType.Simple, "_hhj__", 6 })]
-            [TestCase("__hhj___", 1, Result = new object[] { LayoutType.Bold, "hhj_", 8 })]
-            public static object[] ShouldMoveIteratorInWord(String testedWord, int movesCount)
+            [TestCase("_hgj_ kfdh_", 1, LayoutType.Italic ,"hgj", 5 )]
+            [TestCase("__hghhhj__", 1, LayoutType.Bold, "hghhhj", 10 )]
+            [TestCase("___hhj__", 1, LayoutType.Italic, "__hhj_", 8 )]
+            [TestCase("_hhj__", 1, LayoutType.Simple, "_hhj__", 6 )]
+            [TestCase("__hhj___", 1,LayoutType.Bold, "hhj_", 8 )]
+            public static void ShouldMoveIteratorInWord(String testedWord, int movesCount,
+                LayoutType expectedType, String expectedWord, int expectedLastIndex)
             {
                 var temp = new StringHandler(testedWord);
                 for (int i = 0; i < movesCount; ++i)
                     temp.MoveIterator();
                 var result = temp.oneLevel.GetLastPair();
-                return new object[] { result.Item1, result.Item2, temp._iterator };
+                Assert.AreEqual(expectedType, result.Item1);
+                Assert.AreEqual(expectedWord, result.Item2);
+                Assert.AreEqual(expectedLastIndex, temp._iterator);
             }
         }
     }
