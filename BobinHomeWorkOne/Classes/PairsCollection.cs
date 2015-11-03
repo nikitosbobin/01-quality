@@ -15,10 +15,15 @@ namespace BobinHomeWorkOne.Classes
         private List<TFirstType> leftList;
         private List<TSecondType> rightList;
 
-        public void Add(TFirstType item1, TSecondType item2)
+        public bool Add(TFirstType item1, TSecondType item2)
         {
-            if (item1 != null) leftList.Add(item1);
-            if (item2 != null) rightList.Add(item2);
+            if (item1 != null && item2 != null)
+            {
+                leftList.Add(item1);
+                rightList.Add(item2);
+                return true;
+            }
+            return false;
         }
 
         public int Length
@@ -29,9 +34,20 @@ namespace BobinHomeWorkOne.Classes
         public Tuple<TFirstType, TSecondType> this[int index]
         {
             get
-            {
-                return Tuple.Create(leftList[index], rightList[index]);
+            {   if (index < leftList.Count())
+                    return Tuple.Create(leftList[index], rightList[index]);
+                return null;
             }
+        }
+
+        public Tuple<TFirstType, TSecondType> GetLastPair()
+        {
+            if (leftList.Count() > 0)
+            {
+                int lastIndex = leftList.Count() - 1;
+                return Tuple.Create(leftList[lastIndex], rightList[lastIndex]);
+            }
+            return null;
         }
     }
 }

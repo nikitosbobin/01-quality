@@ -1,4 +1,4 @@
-﻿namespace BobinHomeWorkOne
+﻿namespace BobinHomeWorkOne.Classes
 {
     public enum LayoutType
     {

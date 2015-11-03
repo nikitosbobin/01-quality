@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace BobinHomeWorkOne
+namespace BobinHomeWorkOne.Classes
 {
     public class Text
     {

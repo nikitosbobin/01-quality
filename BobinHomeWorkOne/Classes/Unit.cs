@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BobinHomeWorkOne
+namespace BobinHomeWorkOne.Classes
 {
-    class Unit
+    partial class Unit
     {
         public Unit(List<String> newUnit)
         {
-            lines = new List<Layout>();
+            Lines = new List<Layout>();
             foreach (var t in newUnit)
-                lines.Add(new Layout(t));
+                Lines.Add(new Layout(t));
         }
 
-        private List<Layout> lines;
+        public List<Layout> Lines { get; private set; }
 
         public override String ToString()
         {
             StringBuilder result = new StringBuilder();
             result.AppendLine("<p>");
-            foreach (var e in lines)
-                result.Append(e.ToString());
+            foreach (var e in Lines)
+                result.Append(e);
             result.AppendLine();
             result.Append("</p>");
             return result.ToString();
