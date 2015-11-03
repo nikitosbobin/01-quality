@@ -8,7 +8,7 @@ namespace BobinHomeWorkOne.Classes
     partial class Unit
     {
         [TestFixture]
-        class TestForUnit
+        class UnitTests
         {
             [Test]
             public static void ShouldBuildUnit()

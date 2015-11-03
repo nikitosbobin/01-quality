@@ -114,7 +114,7 @@ namespace BobinHomeWorkOne.Classes
             return residue.IndexOf(findedSubstring, StringComparison.Ordinal);
         }
 
-        private Tuple<int, int> FindLastMark(String input)
+        public Tuple<int, int> FindLastMark(String input)
         {
             var t = SimplifyCodeLayout(input).TrimEnd(';', '.', ' ', ',');
             var layoutText = SplitOptions(t);

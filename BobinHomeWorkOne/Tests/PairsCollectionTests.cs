@@ -40,7 +40,6 @@ namespace BobinHomeWorkOne.Classes
             if (actually.Length > 0)
                 return actually[0].Item1;
             return null;
-
         }
     }
 }

@@ -13,10 +13,11 @@ namespace BobinHomeWorkOne.Classes
             {
                 if (String.IsNullOrEmpty(e.TrimStart(' ')))
                 {
-                    units.Add(new Unit(tmpUnit));
+                    if (tmpUnit.Count != 0)
+                        units.Add(new Unit(tmpUnit));
                     tmpUnit.Clear();
                 }
-                else
+                else 
                     tmpUnit.Add(e);
             }
             units.Add(new Unit(tmpUnit));

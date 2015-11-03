@@ -25,7 +25,24 @@ namespace BobinHomeWorkOne.Classes
         public override bool Equals(object obj)
         {
             var input = obj as FeaturedWord;
+            if (input == null) return false;
             return input.CleanedWord == CleanedWord && input.LastIndex == LastIndex && input.Type == Type;
+        }
+
+        protected bool Equals(FeaturedWord other)
+        {
+            return Type == other.Type && string.Equals(CleanedWord, other.CleanedWord) && LastIndex == other.LastIndex;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (int) Type;
+                hashCode = (hashCode*397) ^ (CleanedWord != null ? CleanedWord.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ LastIndex;
+                return hashCode;
+            }
         }
     }
 }
