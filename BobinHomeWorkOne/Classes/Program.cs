@@ -6,7 +6,7 @@ namespace BobinHomeWorkOne
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main(String[] args)
         {
             var inputFile = File.ReadAllLines(args[0], Encoding.Default);
             var readyHtml = new Text(inputFile);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BobinHomeWorkOne.Classes;
 
 namespace BobinHomeWorkOne
 {
@@ -10,22 +11,22 @@ namespace BobinHomeWorkOne
     {
         public StringHandler(String inputData)
         {
-            oneLevel = new List<KeyValuePair<LayoutType, string>>();
+            oneLevel = new PairsCollection<LayoutType, string>();
             iterator = 0;
             Data = inputData;
-            while (!IsIteratorEnd())
-                MoveIterator();
         }
 
         public String Data { get; private set; }
         private int iterator;
-        private List<KeyValuePair<LayoutType, String>> oneLevel;
+        private PairsCollection<LayoutType, String> oneLevel; 
 
         public List<Layout> Convert()
         {
             List<Layout> result = new List<Layout>();
-            foreach (var item in oneLevel)
-                result.Add(new Layout(item.Value, item.Key));
+            while (!IsIteratorEnd())
+                MoveIterator();
+            for (int i = 0; i < oneLevel.Length ;++i)
+                result.Add(new Layout(oneLevel[i].Item2, oneLevel[i].Item1));
             return result;
         }
 
@@ -40,7 +41,7 @@ namespace BobinHomeWorkOne
             {
                 switch (Data[i])
                 {
-                    case '\\': 
+                    case '\\':
                         if (i < Data.Length - 1 && (Data[i + 1] == '`' || Data[i + 1] == '_'))
                         {
                             Data = Data.Remove(i, 1);
@@ -53,20 +54,20 @@ namespace BobinHomeWorkOne
                         if ((index = StringAfterCode.IndexOf('`')) != -1)
                         {
                             if (i > iterator)
-                                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, Data.Substring(iterator, i - iterator)));
-                            oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Code, StringAfterCode.Substring(0, index)));
+                                oneLevel.Add(LayoutType.Simple, Data.Substring(iterator, i - iterator));
+                            oneLevel.Add(LayoutType.Code, StringAfterCode.Substring(0, index));
                             iterator = i + index + 2;
                             return;
                         }
                         break;
                     case '_':
                         var thisTypeWord = GetNextUnderbar(i);
-                        if (thisTypeWord.Item1 != LayoutType.Null)
+                        if (thisTypeWord.Type != LayoutType.Null)
                         {
                             if (i > iterator)
-                                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, Data.Substring(iterator, i - iterator)));
-                            oneLevel.Add(new KeyValuePair<LayoutType, string>(thisTypeWord.Item1, thisTypeWord.Item2));
-                            iterator = i + thisTypeWord.Item2.Length + thisTypeWord.Item3;
+                                oneLevel.Add(LayoutType.Simple, Data.Substring(iterator, i - iterator));
+                            oneLevel.Add(thisTypeWord.Type, thisTypeWord.CleanedWord);
+                            iterator = i + thisTypeWord.CleanedWord.Length + thisTypeWord.EdgesCount;
                             return;
                         }
                         i++;
@@ -75,37 +76,37 @@ namespace BobinHomeWorkOne
             }
             if (Data.Length - 1 >= iterator)
             {
-                oneLevel.Add(new KeyValuePair<LayoutType, string>(LayoutType.Simple, Data.Substring(iterator)));
+                oneLevel.Add(LayoutType.Simple, Data.Substring(iterator));
                 iterator = Data.Length;
             }
         }
 
-        public Tuple<LayoutType, String, int> GetNextUnderbar(int startIndex)
+        public FeaturedWord GetNextUnderbar(int startIndex)
         {
             int countStart = GetDownCount(Data, true, startIndex);
             Tuple<int, int> result;
             if (countStart + startIndex < Data.Length && Data[countStart + startIndex] == ' ')
-                return new Tuple<LayoutType, String, int>(LayoutType.Null, String.Empty, 0);
+                return new FeaturedWord();
             result = FindLastMark(Data.Substring(startIndex));
             if (result.Item1 != 0)
             {
                 var endIndex = result.Item2;
                 if (countStart == 2 && result.Item1 >= 2)
-                    return new Tuple<LayoutType, string, int>(LayoutType.Bold, Data.Substring(startIndex + 2, endIndex - 3), result.Item1 + countStart);
+                    return new FeaturedWord(LayoutType.Bold, Data.Substring(startIndex + 2, endIndex - 3), result.Item1 + countStart);
                 return (countStart == 1 || countStart == 3) && result.Item1 >= 1
-                    ? new Tuple<LayoutType, string, int>(LayoutType.Italic, Data.Substring(startIndex + 1, endIndex - 1),
+                    ? new FeaturedWord(LayoutType.Italic, Data.Substring(startIndex + 1, endIndex - 1),
                         result.Item1 + countStart)
-                    : new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
+                    : new FeaturedWord();
             }
-            return new Tuple<LayoutType, string, int>(LayoutType.Null, String.Empty, 0);
+            return new FeaturedWord();
         }
 
         private Tuple<int, int> FindLastMark(String input)
         {
             var t = SimplifyCodeLayout(input).TrimEnd(';', '.', ' ', ',');
             var layoutText = SplitOptions(t);
-            if (string.IsNullOrEmpty(layoutText)) return new Tuple<int, int>(0, -1);
-            return new Tuple<int, int>(GetDownCount(layoutText, false), t.IndexOf(layoutText, StringComparison.Ordinal) + layoutText.Length - 1);
+            if (String.IsNullOrEmpty(layoutText)) return new Tuple<int, int>(0, -1);
+            return Tuple.Create(GetDownCount(layoutText, false), t.IndexOf(layoutText, StringComparison.Ordinal) + layoutText.Length - 1);
         }
 
         public static String SplitOptions(String word)
@@ -146,13 +147,13 @@ namespace BobinHomeWorkOne
         private String SimplifyCodeLayout(String input)
         {
             var tempBuilder = new StringBuilder();
-            var inputWithoutIgnore = Regex.Replace(input, @"\\`", ignoreBlock => new string('y', ignoreBlock.Length));
+            var inputWithoutIgnore = Regex.Replace(input, @"\\`", ignoreBlock => new String('y', ignoreBlock.Length));
             while (inputWithoutIgnore.Count(y => y == '`') > 1)
             {
                 var oneBlockInCodeTag = Regex.Match(inputWithoutIgnore, @"`.*?`").ToString();
                 var indexOfStartCodeTag = inputWithoutIgnore.IndexOf(oneBlockInCodeTag, StringComparison.Ordinal);
                 tempBuilder.Append(inputWithoutIgnore.Substring(0, indexOfStartCodeTag));
-                tempBuilder.Append(new string('y', oneBlockInCodeTag.Length));
+                tempBuilder.Append(new String('y', oneBlockInCodeTag.Length));
                 tempBuilder.Append(inputWithoutIgnore.Substring(indexOfStartCodeTag + oneBlockInCodeTag.Length));
                 inputWithoutIgnore = tempBuilder.ToString();
                 tempBuilder.Clear();

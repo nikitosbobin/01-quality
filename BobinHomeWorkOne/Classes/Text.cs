@@ -12,7 +12,7 @@ namespace BobinHomeWorkOne
             units = new List<Unit>();
             foreach (var e in inputText)
             {
-                if (e == "")
+                if (String.IsNullOrEmpty(e.TrimStart(' ')))
                 {
                     units.Add(new Unit(tmpUnit));
                     tmpUnit.Clear();

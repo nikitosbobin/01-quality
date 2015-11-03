@@ -10,7 +10,7 @@ namespace BobinHomeWorkOne
         {
             var stringHandler = new StringHandler(origin);
             type = LayoutType.Simple;
-            inside = stringHandler.Convert();
+            insideLayouts = stringHandler.Convert();
         }
 
         public Layout(String origin, LayoutType type)
@@ -20,31 +20,31 @@ namespace BobinHomeWorkOne
             if (type == LayoutType.Simple || type == LayoutType.Code)
                 this.origin = origin;
             else
-                inside = stringHandler.Convert();
+                insideLayouts = stringHandler.Convert();
         }
 
         public override String ToString()
         {
             switch (type)
             {
-                case LayoutType.Simple: return inside == null ? origin : PrintInside();
-                case LayoutType.Code: return String.Format("<code>{0}</code>", inside == null ? origin : PrintInside());
-                case LayoutType.Bold: return String.Format("<strong>{0}</strong>", PrintInside());
-                case LayoutType.Italic: return String.Format("<em>{0}</em>", PrintInside());
+                case LayoutType.Simple: return insideLayouts == null ? origin : InsideLayoutsToString();
+                case LayoutType.Code: return String.Format("<code>{0}</code>", insideLayouts == null ? origin : InsideLayoutsToString());
+                case LayoutType.Bold: return String.Format("<strong>{0}</strong>", InsideLayoutsToString());
+                case LayoutType.Italic: return String.Format("<em>{0}</em>", InsideLayoutsToString());
             }
             return "";
         }
 
-        private String PrintInside()
+        private String InsideLayoutsToString()
         {
             StringBuilder result = new StringBuilder();
-            foreach (var e in inside)
+            foreach (var e in insideLayouts)
                 result.Append(e);
             return result.ToString();
         }
 
-        public List<Layout> inside;
-        public LayoutType type;
-        public String origin;
+        private List<Layout> insideLayouts;
+        private LayoutType type;
+        private String origin;
     }
 }
