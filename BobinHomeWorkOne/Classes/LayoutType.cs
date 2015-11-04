@@ -2,6 +2,6 @@
 {
     public enum LayoutType
     {
-        Null, Italic, Bold, Simple, Code
+        Null, Italic, Bold, Simple, Code, Image
     }
 }

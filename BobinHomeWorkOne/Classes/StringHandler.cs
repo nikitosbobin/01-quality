@@ -41,7 +41,7 @@ namespace BobinHomeWorkOne.Classes
                 switch (Data[i])
                 {
                     case '\\':
-                        if (i < Data.Length - 1 && (Data[i + 1] == '`' || Data[i + 1] == '_'))
+                        if (i < Data.Length - 1 && (Data[i + 1] == '*' ||Data[i + 1] == '`' || Data[i + 1] == '_'))
                         {
                             Data = Data.Remove(i, 1);
                             i++;
@@ -49,13 +49,25 @@ namespace BobinHomeWorkOne.Classes
                         break;
                     case '`':
                         var stringAfterCode = Data.Substring(i + 1);
-                        int index;
-                        if ((index = stringAfterCode.IndexOf('`')) != -1)
+                        int codeEndIndex;
+                        if ((codeEndIndex = stringAfterCode.IndexOf('`')) != -1)
                         {
                             if (i > _iterator)
                                 oneLevel.Add(LayoutType.Simple, Data.Substring(_iterator, i - _iterator));
-                            oneLevel.Add(LayoutType.Code, stringAfterCode.Substring(0, index));
-                            _iterator = i + index + 2;
+                            oneLevel.Add(LayoutType.Code, stringAfterCode.Substring(0, codeEndIndex));
+                            _iterator = i + codeEndIndex + 2;
+                            return;
+                        }
+                        break;
+                    case '*':
+                        var stringAfterImage = Data.Substring(i + 1);
+                        int imageEndIndex;
+                        if ((imageEndIndex = stringAfterImage.IndexOf('*')) != -1)
+                        {
+                            if (i > _iterator)
+                                oneLevel.Add(LayoutType.Simple, Data.Substring(_iterator, i - _iterator));
+                            oneLevel.Add(LayoutType.Image, stringAfterImage.Substring(0, imageEndIndex));
+                            _iterator = i + imageEndIndex + 2;
                             return;
                         }
                         break;
@@ -146,18 +158,33 @@ namespace BobinHomeWorkOne.Classes
         private String SimplifyCodeLayout(String input)
         {
             var tempBuilder = new StringBuilder();
-            var inputWithoutIgnore = Regex.Replace(input, @"\\`", ignoreBlock => new String('y', ignoreBlock.Length));
-            while (inputWithoutIgnore.Count(y => y == '`') > 1)
+            int openerIndex = 0;
+            String inputWithoutIgnore = Regex.Replace(input, @"\\`|\\\*", ignoreBlock => new String('y', ignoreBlock.Length));
+            while ((openerIndex = FindFirstOpener(inputWithoutIgnore, openerIndex)) != -1)
             {
-                var oneBlockInCodeTag = Regex.Match(inputWithoutIgnore, @"`.*?`").ToString();
-                var indexOfStartCodeTag = inputWithoutIgnore.IndexOf(oneBlockInCodeTag, StringComparison.Ordinal);
-                tempBuilder.Append(inputWithoutIgnore.Substring(0, indexOfStartCodeTag));
-                tempBuilder.Append(new String('y', oneBlockInCodeTag.Length));
-                tempBuilder.Append(inputWithoutIgnore.Substring(indexOfStartCodeTag + oneBlockInCodeTag.Length));
-                inputWithoutIgnore = tempBuilder.ToString();
-                tempBuilder.Clear();
+                var mainOpener = input[openerIndex];
+                while (inputWithoutIgnore.Count(y => y == mainOpener) > 1)
+                {
+                    var oneBlockInCodeTag = Regex.Match(inputWithoutIgnore, '\\' + mainOpener.ToString() + ".*?" + '\\' + mainOpener).ToString();
+                    var indexOfStartCodeTag = inputWithoutIgnore.IndexOf(oneBlockInCodeTag, StringComparison.Ordinal);
+                    tempBuilder.Append(inputWithoutIgnore.Substring(0, indexOfStartCodeTag));
+                    tempBuilder.Append(new String('y', oneBlockInCodeTag.Length));
+                    tempBuilder.Append(inputWithoutIgnore.Substring(indexOfStartCodeTag + oneBlockInCodeTag.Length));
+                    inputWithoutIgnore = tempBuilder.ToString();
+                    tempBuilder.Clear();
+                    openerIndex += oneBlockInCodeTag.Length - 1;
+                }
+                openerIndex++;
             }
             return inputWithoutIgnore;
+        }
+
+        private static int FindFirstOpener(String input, int start)
+        {
+            var tmp = input.Substring(start);
+            var firstOpener = Regex.Match(tmp, @"`|\*").ToString();
+            var index = input.IndexOf(firstOpener, StringComparison.Ordinal);
+            return !String.IsNullOrEmpty(firstOpener) ? index : -1;
         }
 
         public static int GetDownCount(String input, bool right, int index = 0)

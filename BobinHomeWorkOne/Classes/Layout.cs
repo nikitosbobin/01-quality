@@ -17,7 +17,7 @@ namespace BobinHomeWorkOne.Classes
         {
             var stringHandler = new StringHandler(origin);
             this.type = type;
-            if (type == LayoutType.Simple || type == LayoutType.Code)
+            if (type == LayoutType.Simple || type == LayoutType.Code || type == LayoutType.Image)
                 this.origin = origin;
             else
                 insideLayouts = stringHandler.Convert();
@@ -28,7 +28,8 @@ namespace BobinHomeWorkOne.Classes
             switch (type)
             {
                 case LayoutType.Simple: return insideLayouts == null ? origin : InsideLayoutsToString();
-                case LayoutType.Code: return String.Format("<code>{0}</code>", insideLayouts == null ? origin : InsideLayoutsToString());
+                case LayoutType.Code: return String.Format("<code>{0}</code>", origin);
+                case LayoutType.Image: return String.Format("<image>{0}</image>", origin);
                 case LayoutType.Bold: return String.Format("<strong>{0}</strong>", InsideLayoutsToString());
                 case LayoutType.Italic: return String.Format("<em>{0}</em>", InsideLayoutsToString());
             }
