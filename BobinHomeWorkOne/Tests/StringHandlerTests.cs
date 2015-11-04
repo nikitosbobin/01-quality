@@ -29,6 +29,13 @@ namespace BobinHomeWorkOne.Classes
             [TestCase("`hdhk`", Result = "yyyyyy")]
             [TestCase("hh `hdhk` uuiui`hdhk`utri`ff", Result = "hh yyyyyy uuiuiyyyyyyutri`ff")]
             [TestCase("hhh``hh", Result = "hhhyyhh")]
+            [TestCase("hhhhhh `hhg*gg* ` jgj", Result = "hhhhhh yyyyyyyyyy jgj")]
+            [TestCase("hhhhhh *hhg`gg` * jgj", Result = "hhhhhh yyyyyyyyyy jgj")]
+            [TestCase("hhhhhh *hhg`gg* ` jgj", Result = "hhhhhh yyyyyyyy ` jgj")]
+            [TestCase("hhhhhh `hhg*gg` * jgj", Result = "hhhhhh yyyyyyyy * jgj")]
+            [TestCase("hhhhhh *hhg`gg\\* ` jgj", Result = "hhhhhh *hhgyyyyyyy jgj")]
+            [TestCase("hhhhhh `hhg*gg\\` * jgj", Result = "hhhhhh `hhgyyyyyyy jgj")]
+            [TestCase("`hhg*gg\\` `", Result = "yyyyyyyyyyy")]
             public static String ShouldDeleteIgnoredLayouts(String input)
             {
                 var temp = new StringHandler(String.Empty);
@@ -95,6 +102,8 @@ namespace BobinHomeWorkOne.Classes
             [TestCase("___hhj__", 1, LayoutType.Italic, "__hhj_", 8 )]
             [TestCase("_hhj__", 1, LayoutType.Simple, "_hhj__", 6 )]
             [TestCase("__hhj___", 1,LayoutType.Bold, "hhj_", 8 )]
+            [TestCase("*__hhj___*", 1, LayoutType.Image, "__hhj___", 10)]
+            [TestCase("\\*__hhj___*", 1, LayoutType.Simple, "*__hhj___*", 10)]
             public static void ShouldMoveIteratorInWord(String testedWord, int movesCount,
                 LayoutType expectedType, String expectedWord, int expectedLastIndex)
             {
