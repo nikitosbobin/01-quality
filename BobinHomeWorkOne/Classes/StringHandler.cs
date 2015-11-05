@@ -48,28 +48,12 @@ namespace BobinHomeWorkOne.Classes
                         }
                         break;
                     case '`':
-                        var stringAfterCode = Data.Substring(i + 1);
-                        int codeEndIndex;
-                        if ((codeEndIndex = stringAfterCode.IndexOf('`')) != -1)
-                        {
-                            if (i > _iterator)
-                                oneLevel.Add(LayoutType.Simple, Data.Substring(_iterator, i - _iterator));
-                            oneLevel.Add(LayoutType.Code, stringAfterCode.Substring(0, codeEndIndex));
-                            _iterator = i + codeEndIndex + 2;
+                        if (MoveIteratorToIgnoreCloser('`', i))
                             return;
-                        }
                         break;
                     case '*':
-                        var stringAfterImage = Data.Substring(i + 1);
-                        int imageEndIndex;
-                        if ((imageEndIndex = stringAfterImage.IndexOf('*')) != -1)
-                        {
-                            if (i > _iterator)
-                                oneLevel.Add(LayoutType.Simple, Data.Substring(_iterator, i - _iterator));
-                            oneLevel.Add(LayoutType.Image, stringAfterImage.Substring(0, imageEndIndex));
-                            _iterator = i + imageEndIndex + 2;
+                        if (MoveIteratorToIgnoreCloser('*', i))
                             return;
-                        }
                         break;
                     case '_':
                         var thisTypeWord = GetNextUnderbar(i);
@@ -90,6 +74,22 @@ namespace BobinHomeWorkOne.Classes
                 oneLevel.Add(LayoutType.Simple, Data.Substring(_iterator));
                 _iterator = Data.Length;
             }
+        }
+
+        private bool MoveIteratorToIgnoreCloser(char ignoreChar, int index)
+        {
+            var thisType = ignoreChar == '*' ? LayoutType.Image : LayoutType.Code;
+            var stringAfterImage = Data.Substring(index + 1);
+            int imageEndIndex;
+            if ((imageEndIndex = stringAfterImage.IndexOf(ignoreChar)) != -1)
+            {
+                if (index > _iterator)
+                    oneLevel.Add(LayoutType.Simple, Data.Substring(_iterator, index - _iterator));
+                oneLevel.Add(thisType, stringAfterImage.Substring(0, imageEndIndex));
+                _iterator = index + imageEndIndex + 2;
+                return true;
+            }
+            return false;
         }
 
         public FeaturedWord GetNextUnderbar(int startIndex)
